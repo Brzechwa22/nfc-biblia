@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Losowy fragment Pisma Świętego</title>
+<link rel="manifest" href="manifest.json">
+<style>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 40px;
+    background: #f4f4f4;
+}
+
+#loader {
+    margin-top: 40px;
+    border: 6px solid #ddd;
+    border-top: 6px solid #333;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    display: none;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
+
+#siglum {
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 30px;
+}
+
+#tekst {
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+button {
+    margin-top: 30px;
+    padding: 10px 20px;
+}
+</style>
+</head>
+<body>
+
+<h1>📖 Losowy fragment</h1>
+
+<div id="loader"></div>
+<div id="siglum"></div>
+<div id="tekst"></div>
+
+<button onclick="losuj()">Losuj ponownie</button>
+
+<script>
+
+let biblia;
+
+async function wczytajBiblie() {
+    const res = await fetch("biblia.json");
+    biblia = await res.json();
+}
+
+function pokazLoader(pokaz) {
+    document.getElementById("loader").style.display = pokaz ? "block" : "none";
+}
+
+function losuj() {
+    pokazLoader(true);
+
+    setTimeout(() => {
+
+        const ksiegi = Object.keys(biblia);
+        const losKsiega = ksiegi[Math.floor(Math.random() * ksiegi.length)];
+
+        const rozdzialy = Object.keys(biblia[losKsiega]);
+        const losRozdzial = rozdzialy[Math.floor(Math.random() * rozdzialy.length)];
+
+        const wersety = Object.keys(biblia[losKsiega][losRozdzial]);
+        const losWerset = wersety[Math.floor(Math.random() * wersety.length)];
+
+        const tekst = biblia[losKsiega][losRozdzial][losWerset];
+
+        document.getElementById("siglum").innerText =
+            `${losKsiega} ${losRozdzial},${losWerset}`;
+
+        document.getElementById("tekst").innerText = tekst;
+
+        pokazLoader(false);
+
+    }, 600);
+}
+
+wczytajBiblie().then(losuj);
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+}
+
+</script>
+
+</body>
+</html>
