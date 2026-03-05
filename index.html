@@ -1,108 +1,64 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Losowy fragment Pisma Świętego</title>
-<link rel="manifest" href="manifest.json">
-<style>
-body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    padding: 40px;
-    background: #f4f4f4;
-}
-
-#loader {
-    margin-top: 40px;
-    border: 6px solid #ddd;
-    border-top: 6px solid #333;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
-    display: none;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-@keyframes spin {
-    100% { transform: rotate(360deg); }
-}
-
-#siglum {
-    font-size: 22px;
-    font-weight: bold;
-    margin-top: 30px;
-}
-
-#tekst {
-    margin-top: 20px;
-    font-size: 18px;
-}
-
-button {
-    margin-top: 30px;
-    padding: 10px 20px;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Słowo na dziś</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            max-width: 500px;
+        }
+        #tekst {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        #sigla {
+            font-weight: bold;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
 
-<h1>📖 Losowy fragment</h1>
+    <div class="container">
+        <div id="tekst">Ładowanie Słowa...</div>
+        <div id="sigla"></div>
+    </div>
 
-<div id="loader"></div>
-<div id="siglum"></div>
-<div id="tekst"></div>
+    <script>
+        // Pobieramy plik JSON
+        fetch('biblia.json')
+            .then(response => response.json())
+            .then(data => {
+                // Losowanie indeksu z tablicy
+                const randomIndex = Math.floor(Math.random() * data.length);
+                const wylosowanyCytat = data[randomIndex];
 
-<button onclick="losuj()">Losuj ponownie</button>
-
-<script>
-
-let biblia;
-
-async function wczytajBiblie() {
-    const res = await fetch("biblia.json");
-    biblia = await res.json();
-}
-
-function pokazLoader(pokaz) {
-    document.getElementById("loader").style.display = pokaz ? "block" : "none";
-}
-
-function losuj() {
-    pokazLoader(true);
-
-    setTimeout(() => {
-
-        const ksiegi = Object.keys(biblia);
-        const losKsiega = ksiegi[Math.floor(Math.random() * ksiegi.length)];
-
-        const rozdzialy = Object.keys(biblia[losKsiega]);
-        const losRozdzial = rozdzialy[Math.floor(Math.random() * rozdzialy.length)];
-
-        const wersety = Object.keys(biblia[losKsiega][losRozdzial]);
-        const losWerset = wersety[Math.floor(Math.random() * wersety.length)];
-
-        const tekst = biblia[losKsiega][losRozdzial][losWerset];
-
-        document.getElementById("siglum").innerText =
-            `${losKsiega} ${losRozdzial},${losWerset}`;
-
-        document.getElementById("tekst").innerText = tekst;
-
-        pokazLoader(false);
-
-    }, 600);
-}
-
-wczytajBiblie().then(losuj);
-
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-}
-
-</script>
+                // Wstawienie danych do HTML
+                document.getElementById('tekst').innerText = `"${wylosowanyCytat.tekst}"`;
+                document.getElementById('sigla').innerText = wylosowanyCytat.sigla;
+            })
+            .catch(error => {
+                console.error('Błąd podczas ładowania pliku:', error);
+                document.getElementById('tekst').innerText = "Nie udało się załadować cytatu. Spróbuj ponownie.";
+            });
+    </script>
 
 </body>
 </html>
