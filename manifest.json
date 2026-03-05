@@ -1,9 +1,0 @@
-{
-  "name": "Losowy fragment Pisma Świętego",
-  "short_name": "Biblia NFC",
-  "start_url": ".",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#333333",
-  "icons": []
-}
